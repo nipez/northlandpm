@@ -16,6 +16,8 @@ The live deployment (`NLPM-VERSION:v17`, `https://ca310c1d.northlandpmv5.pages.d
 | Output directory | `public` |
 | Production branch | `main` |
 
+Each section has its own path. Clicking **Meet the Team** goes to `/team`; the other nav items use `/services`, `/portal`, `/find-a-home`, `/tides`, and `/contact`. Refresh and shared links open the same page via Cloudflare Pages rewrites in `public/_redirects`.
+
 ## Local preview
 
 ```bash
@@ -23,7 +25,7 @@ npm install
 npm run dev
 ```
 
-Then open the URL Wrangler prints (usually `http://127.0.0.1:8788`).
+Then open `http://127.0.0.1:8788`. Try `/team` directly to confirm the address bar and page stay in sync.
 
 ## Deploy
 

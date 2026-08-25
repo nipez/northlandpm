@@ -1,3 +1,5 @@
+# Pretty URLs: keep /team (and the other section paths) in the address bar
+# while serving the single-page app. Cloudflare Pages honors these 200 rewrites.
 /services /index.html 200
 /services/ /index.html 200
 /services/property-management /index.html 200

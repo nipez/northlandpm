@@ -3,7 +3,7 @@
   "private": true,
   "description": "Northland Property Management — Cloudflare Pages site (northlandpmv5)",
   "scripts": {
-    "dev": "wrangler pages dev public",
+    "dev": "node scripts/dev-server.mjs",
     "deploy": "wrangler pages deploy public --project-name=northlandpmv5 --branch=main"
   },
   "devDependencies": {
