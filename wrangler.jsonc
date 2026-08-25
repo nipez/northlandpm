@@ -2,6 +2,5 @@
   "$schema": "https://unpkg.com/wrangler@4.125.0/config-schema.json",
   "name": "northlandpmv5",
   "compatibility_date": "2026-08-25",
-  "pages_build_output_dir": "public",
-  "preview_urls": true
+  "pages_build_output_dir": "public"
 }
