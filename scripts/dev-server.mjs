@@ -29,6 +29,7 @@ const spaPaths = new Set([
   "/portal",
   "/find-a-home",
   "/tides",
+  "/tidestest",
   "/contact",
 ]);
 
