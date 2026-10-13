@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- NLPM-VERSION:v17 -->
+<!-- NLPM-VERSION:v18 -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -209,6 +209,51 @@ header.scrolled { background:rgba(232,230,227,.97); backdrop-filter:blur(12px); 
 .team-email { display:inline-block; margin-top:12px; font-family:'Outfit',sans-serif; font-size:13.5px; font-weight:500; color:var(--dark-gray); text-decoration:none; word-break:break-word; transition:color .2s ease; }
 .team-email:hover { color:var(--gold); }
 @media (max-width:520px) { .team-grid { grid-template-columns:1fr; } .team-card { padding:32px 20px; } }
+
+/* Tides AppFolio listings */
+.tides-listings-wrap {
+  max-width:1200px;margin:0 auto;padding:0 32px 80px;
+}
+.tides-listings-panel {
+  background:#fff;border-radius:16px;overflow:hidden;
+  box-shadow:0 2px 16px rgba(0,0,0,.04);
+}
+.tides-listings-status {
+  padding:48px 32px;text-align:center;color:var(--med-gray);font-size:15px;line-height:1.7;
+}
+.tides-listings-grid {
+  display:grid;grid-template-columns:1fr;gap:0;
+}
+.tides-listing-card {
+  display:grid;grid-template-columns:minmax(220px,320px) 1fr;gap:0;
+  border-bottom:1px solid rgba(0,0,0,.06);
+  text-decoration:none;color:inherit;background:#fff;
+  transition:background .2s ease;
+}
+.tides-listing-card:last-child { border-bottom:none; }
+.tides-listing-card:hover { background:var(--soft-white); }
+.tides-listing-media {
+  min-height:200px;background:var(--soft-white) center/cover no-repeat;
+}
+.tides-listing-body { padding:28px 28px 24px; display:flex; flex-direction:column; gap:10px; }
+.tides-listing-title {
+  font-family:'Fraunces',serif;font-size:22px;font-weight:500;color:var(--charcoal);
+  line-height:1.25;margin:0;
+}
+.tides-listing-address { color:var(--med-gray);font-size:15px;line-height:1.5;margin:0; }
+.tides-listing-meta {
+  display:flex;flex-wrap:wrap;gap:10px 18px;margin-top:4px;
+  color:var(--charcoal);font-size:14.5px;font-weight:600;
+}
+.tides-listing-meta span { color:var(--med-gray);font-weight:500; }
+.tides-listing-actions { display:flex;flex-wrap:wrap;gap:12px;margin-top:14px; }
+.tides-listing-actions .btn-primary,
+.tides-listing-actions .btn-dark { padding:12px 22px;font-size:14.5px; }
+@media (max-width:768px) {
+  .tides-listings-wrap { padding:0 20px 60px; }
+  .tides-listing-card { grid-template-columns:1fr; }
+  .tides-listing-media { min-height:220px; }
+}
 
 /* FAQ */
 .faq-item {
@@ -649,13 +694,24 @@ a { color:var(--gold); font-weight:600; }
         </div>
       </div>
     </section>
-    <div style="max-width:800px;margin:0 auto;padding:60px 32px 80px;">
+    <div style="max-width:800px;margin:0 auto;padding:60px 32px 24px;">
       <div class="anim" style="background:#fff;border-radius:16px;padding:48px;box-shadow:0 2px 16px rgba(0,0,0,.04);">
         <h2 style="font-family:'Fraunces',serif;font-size:28px;color:var(--charcoal);margin-bottom:20px;">Welcome to The Tides</h2>
         <p style="color:var(--med-gray);font-size:16px;line-height:1.8;margin-bottom:16px;">Now under new management, The Tides offers a fresh take on modern apartment living just 1.5 miles from the heart of downtown Traverse City. Nestled in the desirable 49684 neighborhood, this community features three triplex buildings with one- and two-bedroom apartments.</p>
-        <div style="background:var(--soft-white);border-radius:12px;padding:32px;text-align:center;margin-top:32px;border:1px dashed var(--light-gray);">
-          <div style="font-size:36px;margin-bottom:12px;opacity:.3;">🏢</div>
-          <p style="color:var(--med-gray);font-size:15px;">Current listings at The Tides will appear here when available.</p>
+      </div>
+    </div>
+
+    <div class="tides-listings-wrap anim-d1">
+      <h2 style="font-family:'Fraunces',serif;font-size:28px;color:var(--charcoal);margin:0 0 20px;text-align:center;">Available at The Tides</h2>
+      <p style="color:var(--med-gray);font-size:16px;line-height:1.7;text-align:center;max-width:640px;margin:0 auto 28px;">Current openings from our AppFolio listings, filtered to The Tides community on Veterans Drive.</p>
+      <div class="tides-listings-panel">
+        <div id="tides-listings-root" data-loaded="false" aria-live="polite">
+          <div class="tides-listings-status" id="tides-listings-loading">Loading current Tides listings…</div>
+          <div class="tides-listings-status" id="tides-listings-empty" hidden>No units are listed at The Tides right now. Please check back soon, or <a href="/find-a-home" data-page="findahome" style="color:var(--gold);font-weight:600;text-decoration:none;">browse all available homes</a>.</div>
+          <div class="tides-listings-status" id="tides-listings-error" hidden>We couldn’t load Tides listings just now. You can still <a href="https://northlandpm.appfolio.com/listings/listings" target="_blank" rel="noopener" style="color:var(--gold);font-weight:600;text-decoration:none;">view all AppFolio listings</a>.</div>
+          <div class="tides-listings-grid" id="tides-listings-results" hidden></div>
+          <iframe id="tides-listings-iframe" title="The Tides Rental Listings" loading="lazy" hidden
+            style="width:100%;min-height:1200px;border:none;display:none;"></iframe>
         </div>
       </div>
     </div>
@@ -814,6 +870,211 @@ function pathFor(page, view) {
   return PAGE_PATHS[page] || '/';
 }
 
+const APPFOLIO_LISTINGS_URL = 'https://northlandpm.appfolio.com/listings/listings';
+const APPFOLIO_ORIGIN = 'https://northlandpm.appfolio.com';
+const TIDES_PROPERTY_GROUP = 'The Tides';
+// The Tides is three triplexes at 1510 / 1530 / 1550 Veterans Dr, Traverse City MI 49684.
+const TIDES_ADDRESS_RE = /\b(1510|1530|1550)\s+Veterans\b/i;
+const TIDES_NAME_RE = /\bthe\s+tides\b/i;
+
+function absAppfolioUrl(href) {
+  if (!href) return APPFOLIO_LISTINGS_URL;
+  if (/^https?:\/\//i.test(href)) return href;
+  if (href.charAt(0) === '/') return APPFOLIO_ORIGIN + href;
+  return APPFOLIO_ORIGIN + '/' + href;
+}
+
+function textContent(el) {
+  return el ? (el.textContent || '').replace(/\s+/g, ' ').trim() : '';
+}
+
+function isTidesListing(address, title, description) {
+  var hay = [address, title, description].join(' ');
+  if (TIDES_ADDRESS_RE.test(address || '') || TIDES_ADDRESS_RE.test(hay)) return true;
+  if (TIDES_NAME_RE.test(hay)) return true;
+  return false;
+}
+
+function parseAppfolioListings(html) {
+  var doc = new DOMParser().parseFromString(html, 'text/html');
+  var items = Array.prototype.slice.call(doc.querySelectorAll('.js-listing-item'));
+  return items.map(function(item) {
+    var titleLink = item.querySelector('.js-listing-title a');
+    var applyLink = item.querySelector('.js-listing-apply');
+    var img = item.querySelector('img.js-listing-image');
+    var detailLink = titleLink || item.querySelector('a[href*="/listings/detail/"]');
+    var detailHref = detailLink ? detailLink.getAttribute('href') : '';
+    var rent = '';
+    var bedBath = '';
+    item.querySelectorAll('.detail-box__item').forEach(function(row) {
+      var label = textContent(row.querySelector('.detail-box__label')).toLowerCase();
+      var value = textContent(row.querySelector('.detail-box__value'));
+      if (label === 'rent') rent = value;
+      if (label.indexOf('bed') !== -1) bedBath = value;
+    });
+    if (!rent) rent = textContent(item.querySelector('.js-listing-blurb-rent'));
+    if (!bedBath) bedBath = textContent(item.querySelector('.js-listing-blurb-bed-bath'));
+    return {
+      id: item.id || '',
+      title: textContent(titleLink) || 'Available unit',
+      address: textContent(item.querySelector('.js-listing-address')),
+      description: textContent(item.querySelector('.js-listing-description')),
+      rent: rent,
+      bedBath: bedBath,
+      available: textContent(item.querySelector('.detail-box .js-listing-available')) || textContent(item.querySelector('.js-listing-available')),
+      image: (img && (img.getAttribute('data-original') || img.getAttribute('src'))) || '',
+      detailUrl: absAppfolioUrl(detailHref),
+      applyUrl: absAppfolioUrl(applyLink ? applyLink.getAttribute('href') : detailHref)
+    };
+  });
+}
+
+function showTidesState(state) {
+  var loading = document.getElementById('tides-listings-loading');
+  var empty = document.getElementById('tides-listings-empty');
+  var error = document.getElementById('tides-listings-error');
+  var results = document.getElementById('tides-listings-results');
+  var iframe = document.getElementById('tides-listings-iframe');
+  if (!loading) return;
+  loading.hidden = state !== 'loading';
+  empty.hidden = state !== 'empty';
+  error.hidden = state !== 'error';
+  results.hidden = state !== 'results';
+  if (iframe) {
+    iframe.hidden = state !== 'iframe';
+    iframe.style.display = state === 'iframe' ? 'block' : 'none';
+  }
+}
+
+function renderTidesListings(listings) {
+  var results = document.getElementById('tides-listings-results');
+  results.innerHTML = '';
+  listings.forEach(function(listing) {
+    var card = document.createElement('article');
+    card.className = 'tides-listing-card';
+    card.setAttribute('data-listing-id', listing.id);
+
+    var media = document.createElement('div');
+    media.className = 'tides-listing-media';
+    if (listing.image && listing.image.indexOf('place_holder') === -1) {
+      media.style.backgroundImage = "url('" + listing.image.replace(/'/g, "%27") + "')";
+    }
+
+    var body = document.createElement('div');
+    body.className = 'tides-listing-body';
+
+    var title = document.createElement('h3');
+    title.className = 'tides-listing-title';
+    title.textContent = listing.title;
+
+    var address = document.createElement('p');
+    address.className = 'tides-listing-address';
+    address.textContent = listing.address;
+
+    var meta = document.createElement('div');
+    meta.className = 'tides-listing-meta';
+    if (listing.rent) {
+      var rent = document.createElement('div');
+      rent.appendChild(document.createTextNode(listing.rent + ' '));
+      var rentLabel = document.createElement('span');
+      rentLabel.textContent = 'rent';
+      rent.appendChild(rentLabel);
+      meta.appendChild(rent);
+    }
+    if (listing.bedBath) {
+      var beds = document.createElement('div');
+      beds.textContent = listing.bedBath;
+      meta.appendChild(beds);
+    }
+    if (listing.available) {
+      var avail = document.createElement('div');
+      avail.appendChild(document.createTextNode(listing.available + ' '));
+      var availLabel = document.createElement('span');
+      availLabel.textContent = 'available';
+      avail.appendChild(availLabel);
+      meta.appendChild(avail);
+    }
+
+    var actions = document.createElement('div');
+    actions.className = 'tides-listing-actions';
+    var details = document.createElement('a');
+    details.className = 'btn-dark';
+    details.href = listing.detailUrl;
+    details.target = '_blank';
+    details.rel = 'noopener';
+    details.textContent = 'View Details';
+    var apply = document.createElement('a');
+    apply.className = 'btn-primary';
+    apply.href = listing.applyUrl;
+    apply.target = '_blank';
+    apply.rel = 'noopener';
+    apply.textContent = 'Apply Now';
+    actions.appendChild(details);
+    actions.appendChild(apply);
+
+    body.appendChild(title);
+    body.appendChild(address);
+    if (meta.childNodes.length) body.appendChild(meta);
+    body.appendChild(actions);
+    card.appendChild(media);
+    card.appendChild(body);
+    results.appendChild(card);
+  });
+}
+
+function filterTidesListings(listings) {
+  return listings.filter(function(listing) {
+    return isTidesListing(listing.address, listing.title, listing.description);
+  });
+}
+
+async function loadTidesListings(force) {
+  var root = document.getElementById('tides-listings-root');
+  if (!root) return;
+  if (!force && root.dataset.loaded === 'true') return;
+
+  showTidesState('loading');
+
+  try {
+    // Prefer AppFolio's native property-group filter when an admin group exists.
+    var groupUrl = APPFOLIO_LISTINGS_URL + '?filters%5Bproperty_list%5D=' + encodeURIComponent(TIDES_PROPERTY_GROUP);
+    var groupRes = await fetch(groupUrl, { credentials: 'omit' });
+    var groupHtml = groupRes.ok ? await groupRes.text() : '';
+    var groupListings = groupHtml ? parseAppfolioListings(groupHtml) : [];
+
+    if (groupListings.length) {
+      var iframe = document.getElementById('tides-listings-iframe');
+      iframe.src = groupUrl;
+      showTidesState('iframe');
+      root.dataset.loaded = 'true';
+      root.dataset.matchCount = String(groupListings.length);
+      root.dataset.filterMode = 'property_list';
+      return;
+    }
+
+    // Fallback: same public listings feed as Find a Home, filtered to Tides addresses.
+    var allRes = await fetch(APPFOLIO_LISTINGS_URL, { credentials: 'omit' });
+    if (!allRes.ok) throw new Error('Listings fetch failed');
+    var allHtml = await allRes.text();
+    var tides = filterTidesListings(parseAppfolioListings(allHtml));
+
+    root.dataset.matchCount = String(tides.length);
+    root.dataset.filterMode = 'address';
+
+    if (!tides.length) {
+      showTidesState('empty');
+    } else {
+      renderTidesListings(tides);
+      showTidesState('results');
+    }
+    root.dataset.loaded = 'true';
+  } catch (err) {
+    console.warn('Tides listings failed to load', err);
+    showTidesState('error');
+    root.dataset.loaded = 'false';
+  }
+}
+
 function navigateTo(page, view, opts) {
   opts = opts || {};
   const target = document.getElementById('page-' + page);
@@ -828,6 +1089,10 @@ function navigateTo(page, view, opts) {
 
   if (page === 'services') {
     showServiceView(view || 'tiles', true);
+  }
+
+  if (page === 'tides') {
+    loadTidesListings(false);
   }
 
   document.title = PAGE_TITLES[page] || PAGE_TITLES.home;
