@@ -14,7 +14,7 @@
 /find-a-home/ / 200
 /tides / 200
 /tides/ / 200
-/tidestest / 200
-/tidestest/ / 200
+/tidestest /tides 301
+/tidestest/ /tides 301
 /contact / 200
 /contact/ / 200
