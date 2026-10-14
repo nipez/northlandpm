@@ -5,6 +5,7 @@ import { fileURLToPath } from "node:url";
 
 const root = join(fileURLToPath(new URL(".", import.meta.url)), "..", "public");
 const indexHtml = readFileSync(join(root, "index.html"));
+const redirectsPath = join(root, "_redirects");
 const port = Number(process.env.PORT || 8788);
 
 const types = {
@@ -29,9 +30,27 @@ const spaPaths = new Set([
   "/portal",
   "/find-a-home",
   "/tides",
-  "/tidestest",
   "/contact",
 ]);
+
+/** Parse public/_redirects for external redirects (non-200), matching Cloudflare Pages. */
+function loadRedirects(filePath) {
+  const map = new Map();
+  if (!existsSync(filePath)) return map;
+  for (const line of readFileSync(filePath, "utf8").split(/\r?\n/)) {
+    const trimmed = line.trim();
+    if (!trimmed || trimmed.startsWith("#")) continue;
+    const parts = trimmed.split(/\s+/);
+    if (parts.length < 3) continue;
+    const [from, to, statusRaw] = parts;
+    const status = Number(statusRaw);
+    if (!Number.isFinite(status) || status === 200) continue;
+    map.set(from, { to, status });
+  }
+  return map;
+}
+
+const redirects = loadRedirects(redirectsPath);
 
 function isSpaPath(pathname) {
   const trimmed = pathname.replace(/\/$/, "") || "/";
@@ -42,6 +61,13 @@ createServer((req, res) => {
   const url = new URL(req.url || "/", `http://${req.headers.host || "localhost"}`);
   let pathname = decodeURIComponent(url.pathname);
   if (pathname === "/index.html") pathname = "/";
+
+  const redirect = redirects.get(pathname);
+  if (redirect) {
+    res.writeHead(redirect.status, { Location: redirect.to });
+    res.end();
+    return;
+  }
 
   const safe = normalize(pathname).replace(/^(\.\.[/\\])+/, "");
   const filePath = join(root, safe);
